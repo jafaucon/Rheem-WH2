@@ -93,7 +93,7 @@ def initialize() {
         def name  = waterHeaterList[it]
         if (dev == null) {
 	        try {
-    			addChildDevice("jfaucon", "Rheem Econet Water Heater", it, null, ["name": "Rheem Econet: " + name])
+    			addChildDevice("jjhuff", "Rheem Econet Water Heater", it, null, ["name": "Rheem Econet: " + name])
     	    } catch (e)	{
 				log.debug "addChildDevice Error: $e"
           	}
@@ -205,6 +205,26 @@ def setDeviceEnabled(childDevice, enabled) {
         ])
     }
 }
+def setDeviceMode(childDevice, mode) {
+	log.info "setDeviceEnabled: $childDevice.deviceNetworkId $enabled" 
+	if (login()) {
+    	apiPut("/equipment/$childDevice.deviceNetworkId", [
+        	body: [
+                mode: mode,
+            ]
+        ])
+    }
+}
+def setDeviceOnVacation(childDevice, OnVacation) {
+	log.info "setDeviceOnVacation: $childDevice.deviceNetworkId $OnVacation" 
+	if (login()) {
+    	apiPut("/equipment/$childDevice.deviceNetworkId", [
+        	body: [
+                isOnVacation: OnVacation,
+            ]
+        ])
+    }
+}
 
 private login() {
 	def apiParams = [
@@ -272,7 +292,7 @@ private apiPut(apiPath, apiParams = [], callback = {}) {
         headers: ["Authorization": getApiAuth()],
         requestContentType: "application/json",
 	] + apiParams
-	
+	log.debug "apiPut: $apiParams"
 	try {
 		httpPut(apiParams) { response -> 
         	callback(response)
